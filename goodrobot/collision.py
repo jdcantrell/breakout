@@ -1,4 +1,6 @@
-from math import floor
+from math import floor, fabs
+from Euclid import Segment
+
 class CollisionGrid:
 	def __init__(self, xWidth, yWidth):
 		self.xWidth = xWidth
