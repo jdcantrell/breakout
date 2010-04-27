@@ -29,7 +29,7 @@ class Segment:
         if c:
             return c[0] + c[1] * (c[2]/ (1.0 * c[3]))
         else:
-            return False
+            return None
         
     def collide(self, segment):
         #get segment vectors
