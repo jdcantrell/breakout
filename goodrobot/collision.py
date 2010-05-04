@@ -43,6 +43,36 @@ class CollisionGrid:
                 self.cells[cell].remove(item)
             del self.items[item]
 
+    def addOnGridIntersect(self, item, segment):
+        xDelta = fabs(segment.pt1.x - segment.pt2.x)
+        yDelta = fabs(segment.pt1.y - segment.pt2.y)
+        #Check if segment crosses a grid line
+        #get the start and end point snapping to the nearest grid axis for testing
+        start = ceil(min(segment.pt1.x, segment.pt2.x) / (self.xWidth * 1.0)) * self.xWidth
+        end = floor(max(segment.pt1.x, segment.pt2.x) / (self.xWidth * 1.0)) * self.xWidth
+        while start <= end:
+            i = segment.get_intersection(Segment((start,0),(start,self.height)))
+            if i is None:
+                #segment does not intersect and therefore cannot intersect other segments
+                #not sure how this would get called
+                start = end + 1 
+            else:
+                self.addPoint(item, i.x - self.halfWidth, i.y)
+                self.addPoint(item, i.x,i.y)
+            start = start + self.xWidth
+        #check in the other direction
+        if start > end:
+            start = ceil(min(segment.pt1.y, segment.pt2.y) / (self.yWidth * 1.0)) * self.yWidth
+            end = floor(max(segment.pt1.y, segment.pt2.y) / (self.yWidth * 1.0)) * self.yWidth
+            while start <= end:
+                i = segment.get_intersection(Segment((0, start),(self.width, start)))
+                if i is None:
+                    start = end + 1 
+                else:
+                    self.addPoint(item, i.x, i.y - self.halfHeight)
+                    self.addPoint(item, i.x,i.y)
+                start = start + self.yWidth
+
     #Add a list of points related to the item
     def addPoly(self, item, points):
         previousPoint = None
@@ -50,36 +80,10 @@ class CollisionGrid:
             cell = self.addPoint(item,point[0],point[1])
             if previousPoint is not None:
                 i = None
-                segment = Segment(point,previousPoint)
-                xDelta = fabs(previousPoint[0] - point[0])
-                yDelta = fabs(previousPoint[1] - point[1])
-                #Check if segment crosses a grid line
-                #get the start and end point snapping to the nearest grid axis for testing
-                start = ceil(min(previousPoint[0], point[0]) / (self.xWidth * 1.0)) * self.xWidth
-                end = floor(max(previousPoint[0], point[0]) / (self.xWidth * 1.0)) * self.xWidth
-                while start <= end:
-                    i = segment.get_intersection(Segment((start,0),(start,self.height)))
-                    if i is None:
-                        #segment does not intersect and therefore cannot intersect other segments
-                        #not sure how this would get called
-                        start = end + 1 
-                    else:
-                        self.addPoint(item, i.x - self.halfWidth, i.y)
-                        self.addPoint(item, i.x,i.y)
-                    start = start + self.xWidth
-                #check in the other direction
-                if start > end:
-                    start = ceil(min(previousPoint[1], point[1]) / (self.yWidth * 1.0)) * self.yWidth
-                    end = floor(max(previousPoint[1], point[1]) / (self.yWidth * 1.0)) * self.yWidth
-                    while start <= end:
-                        i = segment.get_intersection(Segment((0, start),(self.width, start)))
-                        if i is None:
-                            start = end + 1 
-                        else:
-                            self.addPoint(item, i.x, i.y - self.halfHeight)
-                            self.addPoint(item, i.x,i.y)
-                        start = start + self.yWidth
+                self.addOnGridIntersect(item, Segment(point,previousPoint))
             previousPoint = point
+        if len(points) > 2:
+            self.addOnGridIntersect(item, Segment(previousPoint, points[0]))
 
     def search(self, item):
         found = []
@@ -90,3 +94,21 @@ class CollisionGrid:
             except ValueError:
                 pass
         return found
+
+#Collision functions
+def collideCircleAABB(c, poly):
+    #find AABB
+    minV = poly.vertices[0]
+    maxV = poly.vertices[0]
+    for vert in poly.vertices:
+        minV.x = min(vert.x, minV.x)
+        minV.y = min(vert.y, minV.y)
+        maxV.x = max(vert.x, maxV.x)
+        maxV.y = max(vert.y, maxV.y)
+    if c.x > minV.x - c.radius and c.y > minV.y - c.radius:
+        if c.y < maxV.y + c.radius and c.x < maxV.x + c.radius:
+            return True
+    return False
+
+
+

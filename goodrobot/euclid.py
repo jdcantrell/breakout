@@ -1,4 +1,5 @@
 from math import fabs
+
 class Vector:
     def __init__(self, point):
         self.x = point[0]
@@ -18,6 +19,18 @@ class Vector:
 
     def determinant(self, v):
         return self.x * v.y - self.y * v.x
+
+class Circle:
+    def __init__(self, x, y, radius):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.rSquared = radius * radius
+
+class Rect:
+    def __init__(self, pt1, pt2, pt3, pt4):
+        self.vertices = [Vector(pt1), Vector(pt2), Vector(pt3), Vector(pt4)]
+
 
 class Segment:
     def __init__(self, pt1, pt2):

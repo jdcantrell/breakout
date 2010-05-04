@@ -1,4 +1,5 @@
 import collision
+import euclid
 import unittest
 
 class KnownValues(unittest.TestCase):
@@ -32,13 +33,36 @@ class KnownValues(unittest.TestCase):
         for item,segment, cells in self.knownValues:
             #add item to grid
             grid.addPoly(item,segment)
-            print "Testing %r" % item
+            #print "Testing %r" % item
             #check that item is in the correct number of cells
             self.assertEqual(len(grid.search(item)),len(cells))
             #check that the item is in the correct cells
             for cell in cells:
                 items = grid.getItems(cell[0] * 10, cell[1] * 10)
                 self.assertTrue(item in items)
+
+    def testAddPolygon(self):
+        grid = collision.CollisionGrid(10,10,40,40)
+        item = ("Triangle")
+        grid.addPoly(item, [(1,8),(38,8),(38,32)])
+        cells = [(0, 0), (1, 0), (2, 0), (3, 0), (3, 1), (3, 2), (3, 3), (2, 2), (1, 2), (0, 1), (1, 1)]
+        #Check that we get the correct number of cells
+        self.assertEqual(len(grid.search(item)), len(cells))
+        #check that the item is in our expected cells
+        for cell in cells:
+            items = grid.getItems(cell[0] * 10, cell[1] * 10)
+            self.assertTrue(item in items)
+
+    def testCircleCollideWithAABB(self):
+        c = euclid.Circle(14.9,10,10)
+        r = euclid.Rect((5, 5), (10, 5), (10, 10), (5, 10))
+        self.assertEqual(collision.collideCircleAABB(c,r), True)
+
+    def testCircleNotCollideWithAABB(self):
+        c = euclid.Circle(15,10,10)
+        r = euclid.Rect((5, 5), (10, 5), (10, 10), (5, 10))
+        self.assertEqual(collision.collideCircleAABB(c,r), False)
+
 
 
 if __name__ == "__main__":
