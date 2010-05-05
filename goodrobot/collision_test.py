@@ -38,7 +38,7 @@ class KnownValues(unittest.TestCase):
             self.assertEqual(len(grid.search(item)),len(cells))
             #check that the item is in the correct cells
             for cell in cells:
-                items = grid.getItems(cell[0] * 10, cell[1] * 10)
+                items = grid.getItems((cell[0] * 10, cell[1] * 10))
                 self.assertTrue(item in items)
 
     def testAddPolygon(self):
@@ -50,7 +50,7 @@ class KnownValues(unittest.TestCase):
         self.assertEqual(len(grid.search(item)), len(cells))
         #check that the item is in our expected cells
         for cell in cells:
-            items = grid.getItems(cell[0] * 10, cell[1] * 10)
+            items = grid.getItems((cell[0] * 10, cell[1] * 10))
             self.assertTrue(item in items)
 
     def testCircleCollideWithAABB(self):
@@ -59,9 +59,14 @@ class KnownValues(unittest.TestCase):
         self.assertEqual(collision.collideCircleAABB(c,r), True)
 
     def testCircleNotCollideWithAABB(self):
-        c = euclid.Circle(15,10,10)
+        c = euclid.Circle(30,30,10)
         r = euclid.Rect((5, 5), (10, 5), (10, 10), (5, 10))
         self.assertEqual(collision.collideCircleAABB(c,r), False)
+	
+    def testCircleCollideFromTop(self):
+        circle = euclid.Circle(500,580,10)
+        bottom = euclid.Rect((10, 580), (590, 580), (590, 590), (10, 590))
+        self.assertEqual(collision.collideCircleAABB(circle, bottom), True)
 
 
 

@@ -30,12 +30,16 @@ class CollisionGrid:
         return cell
 
     #Return all items that might be close to the x,y
-    def getItems(self, x, y):
-        cell = (int(floor(x / self.xWidth)), int(floor(y/self.yWidth)))
-        if self.cells.has_key(cell):
-            return self.cells[cell]
-        else:
-            return []
+    def getItems(self, *remaining):
+        list = []
+        checkedCells = {}
+        for x,y in remaining:
+            cell = (int(floor(x / self.xWidth)), int(floor(y/self.yWidth)))
+            if not checkedCells.has_key(cell):
+                checkedCells[cell] = True
+                if self.cells.has_key(cell):
+                    list = list + self.cells[cell]
+        return set(list)
 
     def removeItem(self, item):
         if self.items.has_key(item):
@@ -98,15 +102,15 @@ class CollisionGrid:
 #Collision functions
 def collideCircleAABB(c, poly):
     #find AABB
-    minV = poly.vertices[0]
-    maxV = poly.vertices[0]
+    minV = Vector((poly.vertices[0].x, poly.vertices[0].y))
+    maxV = Vector((poly.vertices[0].x, poly.vertices[0].y))
     for vert in poly.vertices:
         minV.x = min(vert.x, minV.x)
         minV.y = min(vert.y, minV.y)
         maxV.x = max(vert.x, maxV.x)
         maxV.y = max(vert.y, maxV.y)
     if c.x > minV.x - c.radius and c.y > minV.y - c.radius:
-        if c.y < maxV.y + c.radius and c.x < maxV.x + c.radius:
+        if c.y < (maxV.y + c.radius) and c.x < (maxV.x + c.radius):
             return True
     return False
 
