@@ -1,5 +1,5 @@
-from math import fabs
-
+from math import fabs, sqrt
+episilon = 0.000000000000001
 class Vector:
     def __init__(self, point):
         self.x = point[0]
@@ -17,8 +17,20 @@ class Vector:
     def __mul__(self, scalar):
         return Vector((self.x * scalar, self.y * scalar))
 
+    def __eq__(self,other):
+        return fabs(other.x - self.x) <= episilon and \
+                fabs(other.y - self.y) <= episilon
+
     def determinant(self, v):
         return self.x * v.y - self.y * v.x
+
+    def magnitudeSquared(self):
+        return self.x * self.x  + self.y * self.y
+
+    def unit(self):
+        #eventually may need to do some inverse square optimization
+        magnitude = sqrt(self.x * self.x + self.y * self.y)
+        return self * (1.0 / magnitude)
 
 class Circle:
     def __init__(self, x, y, radius):
@@ -36,6 +48,17 @@ class Segment:
     def __init__(self, pt1, pt2):
         self.pt1 = Vector(pt1)
         self.pt2 = Vector(pt2)
+        self.vector = self.pt1 - self.pt2
+        self.unit = None
+
+    def unitVector(self):
+        if self.unit is None:
+            self.unit = self.vector.unit()
+        return self.unit
+
+    def lengthSquared(self):
+        return self.vector.magnitudeSquared()
+
     
     def get_intersection(self, segment):
         c = self.collide(segment)

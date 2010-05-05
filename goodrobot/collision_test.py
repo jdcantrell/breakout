@@ -1,6 +1,7 @@
 import collision
 import euclid
 import unittest
+from math import sqrt
 
 class KnownValues(unittest.TestCase):
     knownValues = (
@@ -68,7 +69,21 @@ class KnownValues(unittest.TestCase):
         bottom = euclid.Rect((10, 580), (590, 580), (590, 590), (10, 590))
         self.assertEqual(collision.collideCircleAABB(circle, bottom), True)
 
+    def testUnitVector1(self):
+        v = euclid.Vector((4,3))
+        self.assertEqual(v.unit(), euclid.Vector((4.0 / 5.0, 3.0 / 5.0)))
 
+    def testUnitVector2(self):
+        v = euclid.Vector((-7,1))
+        self.assertEqual(v.unit(), euclid.Vector((-7.0 / sqrt(50.0), 1.0 / sqrt(50.0))))
+
+    def testUnitVector3(self):
+        v = euclid.Vector((1,1.0))
+        self.assertEqual(v.unit(), euclid.Vector((1.0 / sqrt(2), 1.0 / sqrt(2))))
+
+    def testUnitVector4(self):
+        v = euclid.Vector((sqrt(.5), sqrt(.5)))
+        self.assertEqual(v.unit(), euclid.Vector((sqrt(.5), sqrt(.5))))
 
 if __name__ == "__main__":
     unittest.main()

@@ -31,15 +31,15 @@ class CollisionGrid:
 
     #Return all items that might be close to the x,y
     def getItems(self, *remaining):
-        list = []
+        list = set()
         checkedCells = {}
         for x,y in remaining:
             cell = (int(floor(x / self.xWidth)), int(floor(y/self.yWidth)))
             if not checkedCells.has_key(cell):
                 checkedCells[cell] = True
                 if self.cells.has_key(cell):
-                    list = list + self.cells[cell]
-        return set(list)
+                    list.update(self.cells[cell])
+        return list
 
     def removeItem(self, item):
         if self.items.has_key(item):
@@ -114,5 +114,15 @@ def collideCircleAABB(c, poly):
             return True
     return False
 
+def collideCicleSegment(c, segment):
+    pass
+#rough sketch: 
+#calculate c - segment.pt1
+#calculate segment.unitVector
+#projMag = segment.unitVector.determinant(pt_v)
+#if projMag > 0 and projMag < segment.magnitude:
+# see if (segment.unitVector * projection - c).magnitudeSquared <= c.radiusSquared
+# then collide!
 
+    
 
