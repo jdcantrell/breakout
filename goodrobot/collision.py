@@ -114,7 +114,7 @@ def collideCircleAABB(c, poly):
             return True
     return False
 
-def collideCicleSegment(c, segment):
+def collideCircleSegment(c, segment):
     pass
 #rough sketch: 
 #calculate c - segment.pt1
