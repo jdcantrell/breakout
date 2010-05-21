@@ -1,5 +1,5 @@
 from math import fabs, sqrt
-episilon = 0.000000000000001
+epsilon = 0.000000000000001
 class Vector:
     def __init__(self, point):
         self.x = point[0]
@@ -24,10 +24,10 @@ class Vector:
         return Vector((self.x * scalar, self.y * scalar))
 
     def __eq__(self,other):
-        return fabs(other.x - self.x) <= episilon and \
-                fabs(other.y - self.y) <= episilon
+        return fabs(other.x - self.x) <= epsilon and \
+                fabs(other.y - self.y) <= epsilon
 
-    def determinant(self, v):
+    def cross(self, v):
         return self.x * v.y - self.y * v.x
 
     def dot(self, v):
@@ -83,17 +83,17 @@ class Segment:
         #get segment vectors
         u = self.pt2 - self.pt1
         v = segment.pt2 - segment.pt1
-        det = u.determinant(v)
+        det = u.cross(v)
 
         #parallel
-        if fabs(det) < .000000000001:
+        if fabs(det) < epsilon:
             return False
         
         #get vector between the pts
         w = self.pt1 - segment.pt1
         
         #Check if lines intersect but not within our segment
-        s = v.determinant(w)
+        s = v.cross(w)
         #s = v.x * w.y - v.y * w.x
         if det < 0:
             if s < det or s > 0:
@@ -102,7 +102,7 @@ class Segment:
             return False
 
         #t = u.x * w.y - u.y * w.x
-        t = u.determinant(w)
+        t = u.cross(w)
         if det < 0:
             if t < det or t > 0:
                 return False
