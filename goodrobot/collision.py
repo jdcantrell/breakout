@@ -33,7 +33,9 @@ class CollisionGrid:
     def getItems(self, *remaining):
         list = set()
         checkedCells = {}
-        for x,y in remaining:
+        for pt in remaining:
+            x = pt[0]
+            y = pt[1]
             cell = (int(floor(x / self.xWidth)), int(floor(y/self.yWidth)))
             if not checkedCells.has_key(cell):
                 checkedCells[cell] = True
