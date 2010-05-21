@@ -8,6 +8,12 @@ class Vector:
     def __repr__(self):
         return "(%f, %f)" % (self.x, self.y)
 
+    def __getitem(self, k):
+        if k == 0:
+            return self.x
+        else:
+            return self.y
+
     def __sub__(self,vector):
         return Vector((self.x - vector.x, self.y - vector.y))
 
@@ -23,6 +29,12 @@ class Vector:
 
     def determinant(self, v):
         return self.x * v.y - self.y * v.x
+
+    def dot(self, v):
+        return self.x * v.x + self.y * v.y
+
+    def reflectNormal(self, nV):
+        return  nV * nV.dot(self) * 2 - self
 
     def magnitudeSquared(self):
         return self.x * self.x  + self.y * self.y

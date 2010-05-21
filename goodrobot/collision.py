@@ -109,10 +109,26 @@ def collideCircleAABB(c, poly):
         minV.y = min(vert.y, minV.y)
         maxV.x = max(vert.x, maxV.x)
         maxV.y = max(vert.y, maxV.y)
-    if c.x > minV.x - c.radius and c.y > minV.y - c.radius:
-        if c.y < (maxV.y + c.radius) and c.x < (maxV.x + c.radius):
-            return True
-    return False
+
+    #get closest point
+    cp = Vector((c.x,c.y))
+    if c.x < minV.x: cp.x = minV.x
+    elif c.x > maxV.x: cp.x = maxV.x
+
+    if c.y < minV.y: cp.y = minV.y
+    elif c.y > maxV.y: cp.y = maxV.y
+
+    dirVector = cp - Vector((c.x, c.y)) 
+    mag = dirVector.magnitudeSquared()
+    if mag < .0001: dirVector = cp
+    if mag <= c.rSquared:
+        #return normal vector
+        if dirVector.y > 0.0001: return Vector((0,-1))
+        if dirVector.y < -0.0001: return Vector((0,1))
+        if dirVector.x < 0.0001: return Vector((1,0))
+        if dirVector.x > -0.0001: return Vector((-1,0))
+    #no normal for collision
+    return None
 
 def collideCircleSegment(c, segment):
     pass

@@ -55,19 +55,36 @@ class KnownValues(unittest.TestCase):
             self.assertTrue(item in items)
 
     def testCircleCollideWithAABB(self):
+        #direct angle test, right now gives way to the x-axis (may need to change this later)
         c = euclid.Circle(14.9,10,10)
         r = euclid.Rect((5, 5), (10, 5), (10, 10), (5, 10))
-        self.assertEqual(collision.collideCircleAABB(c,r), True)
+        self.assertEqual(collision.collideCircleAABB(c,r), euclid.Vector((1,0)))
 
     def testCircleNotCollideWithAABB(self):
         c = euclid.Circle(30,30,10)
         r = euclid.Rect((5, 5), (10, 5), (10, 10), (5, 10))
-        self.assertEqual(collision.collideCircleAABB(c,r), False)
+        self.assertEqual(collision.collideCircleAABB(c,r), None)
 	
     def testCircleCollideFromTop(self):
         circle = euclid.Circle(500,580,10)
         bottom = euclid.Rect((10, 580), (590, 580), (590, 590), (10, 590))
-        self.assertEqual(collision.collideCircleAABB(circle, bottom), True)
+        self.assertEqual(collision.collideCircleAABB(circle, bottom), euclid.Vector((0,-1)))
+
+    def testCircleCollideFromLeft(self):
+        circle = euclid.Circle(92,150,10)
+        rect = euclid.Rect((100, 100), (200, 100), (200, 200), (100, 200))
+        self.assertEqual(collision.collideCircleAABB(circle, rect), euclid.Vector((-1,0)))
+
+    def testCircleCollideFromRight(self):
+        circle = euclid.Circle(205,150,10)
+        rect = euclid.Rect((100, 100), (200, 100), (200, 200), (100, 200))
+        self.assertEqual(collision.collideCircleAABB(circle, rect), euclid.Vector((1,0)))
+
+    def testCircleCollideFromBottom(self):
+        circle = euclid.Circle(150,208,10)
+        rect = euclid.Rect((100, 100), (200, 100), (200, 200), (100, 200))
+        self.assertEqual(collision.collideCircleAABB(circle, rect), euclid.Vector((0,1)))
+
 
     def testUnitVector1(self):
         v = euclid.Vector((4,3))
