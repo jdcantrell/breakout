@@ -69,8 +69,8 @@ class BreakoutState:
             Rect((10, 22), (20, 22), (20, 579), (10, 579)),
             Rect((580, 22), (590, 22), (590, 579), (580, 579))
         ]
-        for (i in self.bricks) self.grid.addPoly(i.coords)
-        for (i in self.edges) self.grid.addPoly(i.vertices)
+        for i in self.bricks: self.grid.addPoly(i.coords)
+        for i in self.edges: self.grid.addPoly(i.vertices)
         self.ball = Ball(300,300, Vector(1,1), 1)
 
     def updatePhyics(self, time, step):
@@ -85,6 +85,7 @@ class BreakoutState:
 
     def updateScreen(self, time, step, intLatency):
         #draw stuff
+        pass
 
 
         
