@@ -8,11 +8,14 @@ class Vector:
     def __repr__(self):
         return "(%f, %f)" % (self.x, self.y)
 
-    def __getitem(self, k):
+    def __getitem__(self, k):
         if k == 0:
             return self.x
         else:
             return self.y
+
+    def __len__(self):
+        return 2
 
     def __sub__(self,vector):
         return Vector((self.x - vector.x, self.y - vector.y))
