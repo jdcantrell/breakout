@@ -37,7 +37,7 @@ class Vector:
         return self.x * v.x + self.y * v.y
 
     def reflectNormal(self, nV):
-        return  nV * nV.dot(self) * 2 - self
+        return  self - nV * nV.dot(self) * 2.0
 
     def magnitudeSquared(self):
         return self.x * self.x  + self.y * self.y
@@ -55,8 +55,9 @@ class Circle:
         self.rSquared = radius * radius
 
 class Rect:
-    def __init__(self, pt1, pt2, pt3, pt4):
+    def __init__(self, pt1, pt2, pt3, pt4,name=None):
         self.vertices = [Vector(pt1), Vector(pt2), Vector(pt3), Vector(pt4)]
+        self.name = name
 
 
 class Segment:
