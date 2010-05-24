@@ -27,13 +27,11 @@ class Brick(Rect):
                     alpha = 0
                 else:
                     alpha = 510 * (.5 - secs)
-                    print "Alpha: %f" % alpha
         pygame.draw.rect(screen, (0,255,0,alpha), (self.vertices[0][0], self.vertices[0][1], 40,10))
 
     def decreaseHP(self):
         self.hp -= 1
         if self.hp == 0:
-            print "Dying!"
             self.dying = True
         return self.hp
 
@@ -65,7 +63,7 @@ class BreakoutState:
 
         self.grid = CollisionGrid(20, 20, 600, 600)
         self.bricks = [
-            Brick(30,50,1),
+            Brick(30,200,1),
             Brick(80,50,1),
             Brick(130,50,1),
             Brick(180,50,1),
@@ -75,21 +73,21 @@ class BreakoutState:
             Brick(380,50,1),
         ]
         self.edges = [
-            Rect((10, 10), (590, 10), (590, 20), (10, 20)),
-            Rect((10, 580), (590, 580), (590, 590), (10, 590)),
-            Rect((10, 22), (20, 22), (20, 579), (10, 579)),
-            Rect((580, 22), (590, 22), (590, 579), (580, 579))
+            Rect((10, 10), (590, 10), (590, 20), (10, 20),"top"),
+            Rect((10, 580), (590, 580), (590, 590), (10, 590),"bottom"),
+            Rect((10, 22), (20, 22), (20, 579), (10, 579),"left"),
+            Rect((580, 22), (590, 22), (590, 579), (580, 579),"right")
         ]
         for i in self.bricks: self.grid.addPoly(i, i.vertices)
         for i in self.edges: self.grid.addPoly(i, i.vertices)
-        self.ball = Ball(300,300, Vector((-1,-1)), 200)
+        self.ball = Ball(100,300, Vector((2,30)), 200)
 
         heartBeat(self.updateScreen, self.updatePhysics, .01)
 
 
     def updatePhysics(self, time, step):
         self.ball.update(step)
-        items = self.grid.getItems(self.ball.position)
+        items = self.grid.getItems(self.ball.position + (self.ball.dV * 10) )
         self.prevIgnore = self.ignore
         self.ignore = []
         for i in items:
@@ -98,8 +96,7 @@ class BreakoutState:
                 if i not in self.prevIgnore:
                     self.ball.dV = self.ball.dV.reflectNormal(normal)
                     if isinstance(i, Brick): 
-                        i.decreaseHP()
-                        if i.dying:
+                        if i.decreaseHP() <= 0:
                             self.grid.removeItem(i)
                 self.ignore.append(i)
 
@@ -110,7 +107,10 @@ class BreakoutState:
             pygame.draw.rect(self.screen, (255,0,0), (edge.vertices[0][0],edge.vertices[0][1], edge.vertices[1][0] - edge.vertices[0][0], edge.vertices[2][1] - edge.vertices[0][1]))
 
         for brick in self.bricks:
-            brick.draw(self.screen, step)
+            if brick.dead:
+                self.bricks.remove(brick)
+            else:
+                brick.draw(self.screen, step)
         
         self.ball.draw(self.screen)
         pygame.display.flip()
@@ -120,8 +120,5 @@ class BreakoutState:
 def main():
     b = BreakoutState()
         
-
-
-
 if __name__ == '__main__':
     sys.exit(main())
