@@ -119,16 +119,23 @@ def collideCircleAABB(c, poly):
 
     if c.y < minV.y: cp.y = minV.y
     elif c.y > maxV.y: cp.y = maxV.y
-
     dirVector = cp - Vector((c.x, c.y)) 
     mag = dirVector.magnitudeSquared()
     if mag < .0001: dirVector = cp
+#TODO detect if normal should a 45 degree angled normal
     if mag <= c.rSquared:
-        #return normal vector
-        if dirVector.y > 0.0001: return Vector((0,-1))
-        if dirVector.y < -0.0001: return Vector((0,1))
-        if dirVector.x < 0.0001: return Vector((1,0))
-        if dirVector.x > -0.0001: return Vector((-1,0))
+        if cp != dirVector:
+            #return normal vector
+            if dirVector.y > 0.0001: return Vector((0,-1))
+            if dirVector.y < -0.0001: return Vector((0,1))
+            if dirVector.x > 0.0001: return Vector((1,0))
+            if dirVector.x < -0.0001: return Vector((-1,0))
+        else:
+#TODO: Fix this section of code
+#Initial idea, test points until we find the line segment the collision is on
+            print "Collision point on boundary, need to do something else for normal!"
+            return None
+
     #no normal for collision
     return None
 
