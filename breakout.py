@@ -10,14 +10,28 @@ from goodrobot.util import heartBeat
 from time import clock,time
 
 class Brick(Rect):
-    def __init__(self, x, y, hp):
+    def __init__(self, x, y, hp, quadList, colorList):
         self.vertices = [Vector((x, y)), Vector((x + 40, y)), Vector((x + 40, y + 10)), Vector((x, y + 10))]
         self.hp = hp
         self.dying = False
         self.dead = False
         self.dyingTick = False
+        self.vertexList = [
+            self.vertices[0].x,self.vertices[0].y, 
+            self.vertices[3].x, self.vertices[3].y, 
+            self.vertices[2].x, self.vertices[2].y, 
+            self.vertices[1].x, self.vertices[1].y
+        ]
+        self.color = [0, 1, 0, 1]
 
-    def draw(self, tick):
+        quadList += self.vertexList
+        self.colorIndex = len(colorList)
+        colorList += self.color
+        colorList += self.color
+        colorList += self.color
+        colorList += self.color
+
+    def draw(self, tick, quadList, colorList):
         alpha = 1.0
         if self.dying:
             if self.dyingTick is False:
@@ -30,8 +44,14 @@ class Brick(Rect):
                     alpha = 0
                 else:
                     alpha =  2.0 * (.5 - secs)
-        glColor4f(0, 1, 0, alpha)
-        glRectf(self.vertices[0][0],self.vertices[0][1], self.vertices[1][0], self.vertices[2][1])
+        #glColor4f(0, 1, 0, alpha)
+        colorList[self.colorIndex:self.colorIndex+4] = [0, 1, 0, alpha]
+        colorList[self.colorIndex+4:self.colorIndex+8] = [0, 1, 0, alpha]
+        colorList[self.colorIndex+8:self.colorIndex+12] = [0, 1, 0, alpha]
+        colorList[self.colorIndex+12:self.colorIndex+16] = [0, 1, 0, alpha]
+
+        
+        #glRectf(self.vertices[0][0],self.vertices[0][1], self.vertices[1][0], self.vertices[2][1])
 
     def decreaseHP(self):
         self.hp -= 1
@@ -80,9 +100,11 @@ class BreakoutState:
 
         self.grid = CollisionGrid(20, 20, 600, 600)
         self.bricks = []
+        self.quadList = []
+        self.colorList = []
         for x in range(0, 11):
             for y in range(0, 24):
-                self.bricks.append(Brick(x*50 + 30, y *20 + 50,1))
+                self.bricks.append(Brick(x*50 + 30, y *20 + 50, 1, self.quadList, self.colorList))
         self.edges = [
             Rect((10, 10), (590, 10), (590, 20), (10, 20),"top"),
             Rect((10, 580), (590, 580), (590, 590), (10, 590),"bottom"),
@@ -133,7 +155,15 @@ class BreakoutState:
             if brick.dead:
                 self.bricks.remove(brick)
             else:
-                brick.draw(step)
+                brick.draw(step, self.quadList, self.colorList)
+        glEnableClientState(GL_COLOR_ARRAY)
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glColorPointer(4, GL_FLOAT, 0, self.colorList)
+        glVertexPointer(2, GL_FLOAT, 0, self.quadList)
+        glDrawArrays(GL_QUADS, 0, len(self.quadList) / 2)
+
+        glDisableClientState(GL_COLOR_ARRAY)
+        glDisableClientState(GL_VERTEX_ARRAY)
         self.ball.draw()
         glFlush()
         pygame.display.flip()
