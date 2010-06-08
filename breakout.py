@@ -1,8 +1,5 @@
 import sys
-import pygame
-from OpenGL.GL import *
-from pygame.locals import *
-from pygame.color import *
+from pyglet.gl import *
 from goodrobot.collision import CollisionGrid, collideCircleAABB
 from goodrobot.euclid import *
 from goodrobot.util import heartBeat
@@ -44,15 +41,12 @@ class Brick(Rect):
                     alpha = 0
                 else:
                     alpha =  2.0 * (.5 - secs)
-        #glColor4f(0, 1, 0, alpha)
-        colorList[self.colorIndex:self.colorIndex+4] = [0, 1, 0, alpha]
-        colorList[self.colorIndex+4:self.colorIndex+8] = [0, 1, 0, alpha]
-        colorList[self.colorIndex+8:self.colorIndex+12] = [0, 1, 0, alpha]
-        colorList[self.colorIndex+12:self.colorIndex+16] = [0, 1, 0, alpha]
-
+        #we only need to change the alpha for these
+        colorList[self.colorIndex + 3] = alpha
+        colorList[self.colorIndex + 7] = alpha
+        colorList[self.colorIndex + 11] = alpha
+        colorList[self.colorIndex + 15] = alpha
         
-        #glRectf(self.vertices[0][0],self.vertices[0][1], self.vertices[1][0], self.vertices[2][1])
-
     def decreaseHP(self):
         self.hp -= 1
         if self.hp == 0:
@@ -80,8 +74,8 @@ class Ball(Circle):
 
 class BreakoutState:
     def __init__(self):
-        pygame.init()
-        self.screen = pygame.display.set_mode((600, 600), OPENGL | DOUBLEBUF)
+        self.window = pyglet.window.Window(600, 600, "Breakout")
+        self.window.set_vsync(False)
 
         glMatrixMode(GL_PROJECTION) 
         glLoadIdentity()
@@ -92,8 +86,8 @@ class BreakoutState:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         glPointSize(10)
 
-        pygame.display.set_caption('Breakout')
-        self.clock = pygame.time.Clock()
+        glEnableClientState(GL_COLOR_ARRAY)
+        glEnableClientState(GL_VERTEX_ARRAY)
         self.running = True
         self.prevIgnore = []
         self.ignore = []
@@ -114,6 +108,8 @@ class BreakoutState:
         for i in self.bricks: self.grid.addPoly(i, i.vertices)
         for i in self.edges: self.grid.addPoly(i, i.vertices)
         self.ball = Ball(100,550, Vector((2,9)), 400)
+        self.quads = (GLfloat * len(self.quadList))(*self.quadList)
+        self.colors = (GLfloat * len(self.colorList))(*self.colorList)
 
         self.frames = 1
         self.pFrames = 1
@@ -141,7 +137,7 @@ class BreakoutState:
                             self.grid.removeItem(i)
                 self.ignore.append(i)
         #self.pTime += time() - start
-
+    
     def updateScreen(self, t, step, intLatency):
         start = time()
         #draw stuff
@@ -155,18 +151,14 @@ class BreakoutState:
             if brick.dead:
                 self.bricks.remove(brick)
             else:
-                brick.draw(step, self.quadList, self.colorList)
-        glEnableClientState(GL_COLOR_ARRAY)
-        glEnableClientState(GL_VERTEX_ARRAY)
-        glColorPointer(4, GL_FLOAT, 0, self.colorList)
-        glVertexPointer(2, GL_FLOAT, 0, self.quadList)
+                brick.draw(step, self.quads, self.colors)
+        glColorPointer(4, GL_FLOAT, 0, self.colors)
+        glVertexPointer(2, GL_FLOAT, 0, self.quads)
         glDrawArrays(GL_QUADS, 0, len(self.quadList) / 2)
 
-        glDisableClientState(GL_COLOR_ARRAY)
-        glDisableClientState(GL_VERTEX_ARRAY)
         self.ball.draw()
         glFlush()
-        pygame.display.flip()
+        self.window.flip()
 
         self.fTime += time() - start
         self.frames += 1
